@@ -1,6 +1,7 @@
 package thread;
 
 import conf.ConfigurationManager;
+import consts.ConfConstants;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -23,7 +24,7 @@ public class SoundBoardServerThread implements Runnable {
     }
     private SoundBoardServerThread() {
         try {
-            int PORT = Integer.parseInt(ConfigurationManager.getInstance().getProperty("sound.board.socket.port"));
+            int PORT = Integer.parseInt(ConfigurationManager.getInstance().getProperty(ConfConstants.SOCKET_PORT));
             serverSocket = new ServerSocket(PORT);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -49,9 +50,21 @@ public class SoundBoardServerThread implements Runnable {
 
     public void notifySoundRequest(ClientSocketThread clientSocketThreadToExclude, byte[] mp3Data) {
         for(ClientSocketThread clientSocketThread : clientSockets) {
-            if(clientSocketThread != clientSocketThreadToExclude) {
+            //if(clientSocketThread != clientSocketThreadToExclude) {
                 clientSocketThread.notifyClientToPlayAudio(mp3Data);
-            }
+            //}
+        }
+    }
+
+    public void removeSocketFromList(ClientSocketThread clientSocketThread) {
+        clientSockets.remove(clientSocketThread);
+    }
+
+    public void notifyClientsAboutNewSound(ClientSocketThread clientSocketThreadToExclude, String soundName) {
+        for(ClientSocketThread clientSocketThread : clientSockets) {
+            //if(clientSocketThread != clientSocketThreadToExclude) {
+            clientSocketThread.notifyClientAboutNewSound(soundName);
+            //}
         }
     }
 }
